@@ -30,6 +30,7 @@ import os
 import posix
 import subprocess
 import sys
+from platform import python_version_tuple
 
 from six import StringIO
 from six.moves import input
@@ -42,6 +43,7 @@ import keychain
 
 _stash = globals()['_stash']
 SAVE_PASSWORDS = True
+pythonver = python_version_tuple()[0]
 
 # temporary -- install required modules
 # needed for dulwich: subprocess needs to have Popen
@@ -55,7 +57,10 @@ if not hasattr(subprocess, 'call'):
 
     subprocess.Popen = Popen
     subprocess.call = call
-GITTLE_URL = 'https://github.com/jsbain/gittle/archive/master.zip'
+if pythonver == '2':
+    GITTLE_URL = 'https://github.com/jsbain/gittle/archive/master.zip'
+elif pythonver == '3':
+    GITTLE_URL = 'https://github.com/dedsecer/gittle3/archive/master.zip'
 FUNKY_URL = 'https://github.com/FriendCode/funky/archive/master.zip'
 DULWICH_URL = 'https://github.com/jsbain/dulwich/archive/ForStaSH_0.12.2.zip'
 REQUIRED_DULWICH_VERSION = (0, 12, 2)
@@ -131,7 +136,10 @@ if AUTODOWNLOAD_DEPENDENCIES:
     #gittle, funky
     # todo... check gittle version
     try:
-        gittle_path = os.path.join(libpath, 'gittle')
+        if pythonver == '2':
+            gittle_path = os.path.join(libpath, 'gittle')
+        elif pythonver == '3':
+            gittle_path = os.path.join(libpath, 'gittle3')
         funky_path = os.path.join(libpath, 'funky')
         #i have no idea why this is getting cleared...
         if libpath not in sys.path:
@@ -141,7 +149,13 @@ if AUTODOWNLOAD_DEPENDENCIES:
     except ImportError:
         _stash('wget {} -o $TMPDIR/gittle.zip'.format(GITTLE_URL))
         _stash('unzip $TMPDIR/gittle.zip -d $TMPDIR/gittle')
-        _stash('mv $TMPDIR/gittle/gittle $STASH_ROOT/lib')
+        if pythonver == '2':
+            _stash('mv $TMPDIR/gittle/gittle $STASH_ROOT/lib/gittle')
+            import gittle
+        elif pythonver == '3':
+            _stash('mv $TMPDIR/gittle/gittle $STASH_ROOT/lib/gittle3')
+            import gittle3
+
         _stash('wget {} -o $TMPDIR/funky.zip'.format(FUNKY_URL))
         _stash('unzip $TMPDIR/funky.zip -d $TMPDIR/funky')
         _stash('mv $TMPDIR/funky/funky $STASH_ROOT/lib')
@@ -149,7 +163,7 @@ if AUTODOWNLOAD_DEPENDENCIES:
         _stash('rm  $TMPDIR/funky.zip')
         _stash('rm -r $TMPDIR/gittle')
         _stash('rm -r $TMPDIR/funky')
-        import gittle
+
         Gittle = gittle.Gittle
     ## end install modules
 else:

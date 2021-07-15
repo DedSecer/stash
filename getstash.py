@@ -7,8 +7,8 @@ import zipfile
 import time
 
 
-DEFAULT_REPO = "ywangd"
-DEFAULT_BRANCH = "master"
+DEFAULT_REPO = "dedsecer"
+DEFAULT_BRANCH = "gittle3"
 TMPDIR = os.environ.get('TMPDIR', os.environ.get('TMP'))
 URL_TEMPLATE = 'https://github.com/{}/stash/archive/{}.zip'
 TEMP_ZIPFILE = os.path.join(TMPDIR, 'StaSh.zip')
