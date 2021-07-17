@@ -62,8 +62,9 @@ if pythonver == '2':
 elif pythonver == '3':
     GITTLE_URL = 'https://github.com/dedsecer/gittle3/archive/master.zip'
 FUNKY_URL = 'https://github.com/FriendCode/funky/archive/master.zip'
-DULWICH_URL = 'https://github.com/jsbain/dulwich/archive/ForStaSH_0.12.2.zip'
-REQUIRED_DULWICH_VERSION = (0, 12, 2)
+#DULWICH_URL = 'https://github.com/jsbain/dulwich/archive/ForStaSH_0.12.2.zip'
+DULWICH_URL = 'https://github.com/dulwich/dulwich/archive/0.19.zip'
+REQUIRED_DULWICH_VERSION = (0, 19, 17)
 AUTODOWNLOAD_DEPENDENCIES = True
 
 if AUTODOWNLOAD_DEPENDENCIES:
@@ -136,25 +137,27 @@ if AUTODOWNLOAD_DEPENDENCIES:
     #gittle, funky
     # todo... check gittle version
     try:
+        #funky_path = os.path.join(libpath, 'funky')
         if pythonver == '2':
-            gittle_path = os.path.join(libpath, 'gittle')
+            #gittle_path = os.path.join(libpath, 'gittle')
+            import gittle
+            Gittle = gittle.Gittle
         elif pythonver == '3':
-            gittle_path = os.path.join(libpath, 'gittle3')
-        funky_path = os.path.join(libpath, 'funky')
+            #gittle_path = os.path.join(libpath, 'gittle3')
+            import gittle3
+            Gittle = gittle3.Gittle
+
         #i have no idea why this is getting cleared...
-        if libpath not in sys.path:
-            sys.path.insert(1, libpath)
-        import gittle
-        Gittle = gittle.Gittle
+        #if libpath not in sys.path:
+        #    sys.path.insert(1, libpath)
+
     except ImportError:
         _stash('wget {} -o $TMPDIR/gittle.zip'.format(GITTLE_URL))
         _stash('unzip $TMPDIR/gittle.zip -d $TMPDIR/gittle')
         if pythonver == '2':
-            _stash('mv $TMPDIR/gittle/gittle $STASH_ROOT/lib/gittle')
-            import gittle
+            _stash('mv $TMPDIR/gittle/gittle/ $STASH_ROOT/lib/gittle')
         elif pythonver == '3':
-            _stash('mv $TMPDIR/gittle/gittle $STASH_ROOT/lib/gittle3')
-            import gittle3
+            _stash('mv $TMPDIR/gittle/gittle3/ $STASH_ROOT/lib/gittle3')
 
         _stash('wget {} -o $TMPDIR/funky.zip'.format(FUNKY_URL))
         _stash('unzip $TMPDIR/funky.zip -d $TMPDIR/funky')
@@ -163,15 +166,23 @@ if AUTODOWNLOAD_DEPENDENCIES:
         _stash('rm  $TMPDIR/funky.zip')
         _stash('rm -r $TMPDIR/gittle')
         _stash('rm -r $TMPDIR/funky')
+        if pythonver == '2':
+            from gittle import Gittle
+        elif pythonver == '3':
+            from gittle3 import Gittle
 
-        Gittle = gittle.Gittle
+
+
     ## end install modules
 else:
     import dulwich
     from dulwich.client import default_user_agent_string
     from dulwich import porcelain
     from dulwich.index import index_entry_from_stat
-    from gittle import Gittle
+    if pythonver == '2':
+        from gittle import Gittle
+    elif pythonver == '3':
+        from gittle3 import Gittle
 
 dulwich.client.get_ssh_vendor = dulwich.client.ParamikoSSHVendor
 #  end temporary
