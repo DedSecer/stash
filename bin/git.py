@@ -137,19 +137,13 @@ if AUTODOWNLOAD_DEPENDENCIES:
     #gittle, funky
     # todo... check gittle version
     try:
-        #funky_path = os.path.join(libpath, 'funky')
         if pythonver == '2':
-            #gittle_path = os.path.join(libpath, 'gittle')
             import gittle
             Gittle = gittle.Gittle
         elif pythonver == '3':
-            #gittle_path = os.path.join(libpath, 'gittle3')
             import gittle3
             Gittle = gittle3.Gittle
 
-        #i have no idea why this is getting cleared...
-        #if libpath not in sys.path:
-        #    sys.path.insert(1, libpath)
 
     except ImportError:
         _stash('wget {} -o $TMPDIR/gittle.zip'.format(GITTLE_URL))
